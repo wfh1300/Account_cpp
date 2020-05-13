@@ -26,4 +26,9 @@ namespace rt {
 
 		return fmt::format("{}_{}", topic, result);
 	}
+
+	string generate_uuid_v4() {
+		boost::uuids::random_generator uuid_v4;
+		return boost::uuids::to_string(uuid_v4());
+	}
 }

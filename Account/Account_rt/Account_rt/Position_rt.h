@@ -10,7 +10,7 @@
 #include <hikyuu/DataType.h>
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/utilities/Null.h>
-#include "Parameter_rt.h"
+#include "utilities/Parameter_rt.h"
 #include "Order_rt.h"
 #include "Map_Any.h"
 #include "Market_Preset.h"

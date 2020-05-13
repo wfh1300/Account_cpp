@@ -8,7 +8,7 @@
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/utilities/Null.h>
 
-#include "Parameter_rt.h"
+#include "utilities/Parameter_rt.h"
 #include "Market_Preset.h"
 using namespace hku;
 namespace rt {
