@@ -23,6 +23,7 @@ namespace rt {
     public:
         MongoJob(const string& db_name);
         void save_position(const string& collection_name, const string& message);
+        string find_account(const string& collection, const string& account_cookie, const string& password);
         ~MongoJob() {}
     private:
         static mongocxx::instance m_inst;

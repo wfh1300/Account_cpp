@@ -10,6 +10,8 @@
 #include "Market_Preset.h"
 #include "DataBase/MongoJob.h"
 #include "utilities/type_rt.h"
+#include "utilities/JsonJob.h"
+#include "Position_rt.h"
 
 using namespace std;
 using namespace hku;
@@ -29,6 +31,7 @@ public:
 		price_t init_cash = 1000000,
 		const string& taskid = rt::generate_uuid_v4()
 		);
+	virtual ~Account_rt() {}
 
 	//未实现
 	void initial();
@@ -39,7 +42,7 @@ public:
 	void ask_withdraw(price_t money);
 	void create_simaccount();
 	bool add_position(/*Position_rt? position*/);
-	void log();
+	void log(const string& message);
 	string open_orders();
 	string message();
 	string account_msg();
@@ -53,6 +56,9 @@ public:
 	price_t m_margin();
 	price_t m_commission();
 	price_t m_balance();
+
+	virtual void on_reload();
+	virtual void on_sync();
 
 	bool order_check(const string& code, amount_t amount, price_t price, int towards, const string& order_id);
 	string send_order(const string& code, amount_t amount, price_t price, int towards, const string& order_id);
@@ -81,7 +87,7 @@ private:
 	string m_investor_name;							//实盘的开户人姓名
 	string m_bank_password;
 	string m_capital_password;
-	string m_wsuir;
+	string m_wsuri;
 	string m_bank_id;								//"SIM"
 	string m_bankname;								//"SIMBANK"
 	string m_trade_host;
@@ -101,12 +107,13 @@ private:
 	string m_event_id;
 	string m_task_id;
 	price_t m_money;
-	string m_transfers;								//QIFI协议，这里估计是json {}
-	string m_banks;									//{}
-	string m_frozen;								//{}
-	string m_events;								//{}
-	string m_positions;								//{}
-	string m_trades;								//{}
-	string m_orders;								//{}
+	//下面的使用string类型的Json更加适合
+	rt::JsonJob m_transfers;						//QIFI协议，这里估计是json {}
+	rt::JsonJob m_banks;							//{}
+	rt::JsonJob m_frozen;							//{}
+	rt::JsonJob m_events;							//{}
+	map<string, rt::Position_rt> m_positions;		//{}
+	rt::JsonJob m_trades;							//{}
+	rt::JsonJob m_orders;							//{}
 };
 

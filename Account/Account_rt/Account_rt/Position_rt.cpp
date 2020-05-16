@@ -7,6 +7,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/document.h>
 
+
 #include "DataBase/MongoJob.h"
 namespace rt {
 	Position_rt::Position_rt(
@@ -44,7 +45,8 @@ namespace rt {
 		const string& market_type,
 		const string& exchange_id,
 		const StringList& trades,
-		const string& orders,
+		//const string& orders,
+		const JsonJob& orders,
 		//const Str_Order& orders,
 
 		const string& name,
@@ -331,7 +333,7 @@ namespace rt {
 		writer.EndArray();
 		//TODO Order序列化
 		writer.Key("orders");
-		writer.String(m_orders.c_str());
+		writer.String(m_orders.jsonstr().c_str());
 		writer.EndObject();
 		return s.GetString();
 	}
@@ -399,7 +401,7 @@ namespace rt {
 
 	string Position_rt::send_order(price_t amount, price_t price, int towards) {
 		rapidjson::Document d_orders;
-		d_orders.Parse(m_orders.c_str());
+		//d_orders.Parse(m_orders.c_str());
 
 		boost::uuids::random_generator uuid_v4;
 		string order_id = boost::uuids::to_string(uuid_v4());
@@ -434,17 +436,17 @@ namespace rt {
 			//将上面生成的json赋值给m_orders[order_id]
 			rapidjson::Document d_value;
 			d_value.Parse(buffer.GetString());
-			if (d_orders.HasMember(order_id.c_str())) {
-				d_orders[order_id.c_str()] = rapidjson::Value(d_value, d_orders.GetAllocator());
-			}
-			else {
-				d_orders.AddMember(rapidjson::Value(order_id.c_str(), d_orders.GetAllocator()), d_value, d_orders.GetAllocator());
-			}
-			rapidjson::StringBuffer buffer_orders;
-			rapidjson::Writer<rapidjson::StringBuffer> writer_orders(buffer_orders);
-			d_orders.Accept(writer_orders);
-			m_orders = buffer_orders.GetString();
-
+			//if (d_orders.HasMember(order_id.c_str())) {
+			//	d_orders[order_id.c_str()] = rapidjson::Value(d_value, d_orders.GetAllocator());
+			//}
+			//else {
+			//	d_orders.AddMember(rapidjson::Value(order_id.c_str(), d_orders.GetAllocator()), d_value, d_orders.GetAllocator());
+			//}
+			//rapidjson::StringBuffer buffer_orders;
+			//rapidjson::Writer<rapidjson::StringBuffer> writer_orders(buffer_orders);
+			//d_orders.Accept(writer_orders);
+			//m_orders = buffer_orders.GetString();
+			m_orders.add_document(order_id.c_str(), d_orders);
 
 			//返回生成的json
 			return buffer.GetString();
@@ -644,6 +646,67 @@ namespace rt {
 			//回放订单/注册进订单系统
 			string order_json = send_order(order.amount(), order.price(), order.towards());
 		}
+	}
+
+	static Position_rt loadfrommessage(const string& position) {
+		JsonJob parser(position);
+		string code_ = parser.hasMember("code") ? parser["code"].GetString() : parser["instrument_id"].GetString();
+		auto array_ = parser["trades"].GetArray();
+		StringList trades_;
+		for (auto iter = array_.begin(); iter != array_.end(); ++iter) {
+			trades_.push_back(iter->GetString());
+		}
+		Str_Price_t frozen_;
+		auto object_ = parser["frozen"].GetObject();
+		for (auto iter = object_.begin(); iter != object_.end(); ++iter) {
+			frozen_[iter->name.GetString()] = iter->value.GetDouble();
+		}
+		rt::JsonJob orders_(parser["orders"]);
+	
+		Position_rt result(
+			code_,
+			parser["account_cookie"].GetString(),
+			parser["portfolio_cookie"].GetString(),
+			parser["username"].GetString(),
+			parser["moneypreset"].GetDouble(), //初始分配资金
+			frozen_,
+			parser["moneypresetLeft"].GetDouble(),//负数表示default
+			parser["volume_long_today"].GetDouble(),
+			parser["volume_long_his"].GetDouble(),
+			parser["volume_short_today"].GetDouble(),
+			parser["volume_short_his"].GetDouble(),
+
+			parser["volume_long_frozen_his"].GetDouble(),
+			parser["volume_long_frozen_today"].GetDouble(),
+			parser["volume_short_frozen_his"].GetDouble(),
+			parser["volume_short_frozen_today"].GetDouble(),
+
+			parser["margin_long"].GetDouble(),
+			parser["margin_short"].GetDouble(),
+
+			parser["open_price_long"].GetDouble(),
+			parser["open_price_short"].GetDouble(),
+			parser["position_price_long"].GetDouble(),
+			parser["position_price_short"].GetDouble(),
+
+			parser["open_cost_long"].GetDouble(),
+			parser["open_cost_short"].GetDouble(),
+			parser["position_cost_long"].GetDouble(),
+			parser["position_cost_short"].GetDouble(),
+
+			parser["position_id"].GetString(),
+			parser["market_type"].GetString(),
+			parser["exchange_id"].GetString(),
+			trades_,
+			orders_,
+
+			parser["name"].GetString(),
+			parser["commission"].GetDouble()
+			/*, auto_reload = false,
+			allow_exceed = false,
+			spms_id = "",
+			oms_id = ""*/);
+		return result;
 	}
 }
 

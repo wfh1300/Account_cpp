@@ -14,8 +14,8 @@
 #include "Order_rt.h"
 #include "Map_Any.h"
 #include "Market_Preset.h"
-#include "type_rt.h"
-
+#include "utilities/type_rt.h"
+#include "utilities/JsonJob.h"
 using namespace hku;
 namespace rt {
 	typedef shared_ptr<Order_rt> Order_rt_Ptr;//因为Order_rt没定义operator=
@@ -62,7 +62,8 @@ namespace rt {
 			const string& market_type = "",
 			const string& exchange_id = "",
 			const StringList& trades = hku::Null<StringList>(),
-			const string& orders = "{}",
+			//const string& orders = "{}",
+			const JsonJob& orders = rt::JsonJob(),
 			//
 			//const Str_Order& orders = hku::Null<Str_Order>(),
 
@@ -127,7 +128,7 @@ namespace rt {
 		//void on_bar(), 这个形参没考虑好用json还是用hku::KData;先放着
 		//void on_tick(), 同理
 		//reload
-		//loadfrommessage
+		static Position_rt loadfrommessage(const string& position);
 		//readdiff
 		//以上没有实现，后续考虑实现
 
@@ -181,7 +182,7 @@ namespace rt {
 		price_t m_commission;
 		StringList m_trades;
 
-		string m_orders;
+		rt::JsonJob m_orders;
 		//Str_Order m_orders;	//用这个试试
 		//json字符串，用string表示，要时刻更新(m_orders = new_orders)。
 		//rapidjson::Document 无法=赋值，所以只能是string

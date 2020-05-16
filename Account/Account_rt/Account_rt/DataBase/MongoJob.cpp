@@ -1,5 +1,6 @@
 #include "MongoJob.h"
 #include "../Position_rt.h"
+#include "../utilities/JsonJob.h"
 namespace rt {
 
     mongocxx::instance MongoJob::m_inst{};
@@ -23,5 +24,20 @@ namespace rt {
             //插入数据
             coll.insert_one(doc_value.view());//return type: bsoncxx::stdx::optional<mongocxx::result::insert_one>
         //}
+    }
+
+    string MongoJob::find_account(const string& collection, const string& account_cookie, const string& password) {
+        mongocxx::collection coll = m_db[collection];
+        //尽量不要用auto
+        bsoncxx::stdx::optional<bsoncxx::document::value> result = coll.find_one(document{} <<
+            "account_cookie" << account_cookie <<
+            "password" << password << finalize);
+        if (result) {
+            return bsoncxx::to_json(*result);
+        }
+        else {
+            HKU_WARN("Account not found!");
+            return "";
+        }
     }
 }

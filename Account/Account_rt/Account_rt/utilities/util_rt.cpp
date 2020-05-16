@@ -31,4 +31,74 @@ namespace rt {
 		boost::uuids::random_generator uuid_v4;
 		return boost::uuids::to_string(uuid_v4());
 	}
+
+	//hku::Datetime curr_datetime(const string& interval, const string& interval2) {
+	//	string result;
+	//	struct tm t;
+	//	time_t now;
+	//	time(&now);
+	//	localtime_s(&t, &now);
+	//	//result += to_string(t.tm_year + 1900) + interval + to_string(t.tm_mon + 1)
+	//	//	+ interval + to_string(t.tm_mday) + " " + to_string(t.tm_hour) + interval2 + 
+	//	//	to_string(t.tm_min) + interval2 + to_string(t.tm_sec);
+	//	//now 获取不了毫秒
+	//	hku::Datetime(t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, 
+	//		t.tm_min, t.tm_sec, 0, 0);
+	//}
+
+	int current_year() {
+		struct tm t; //存储当前时间的数据结构
+		time_t now;  
+		time(&now);  //获取当前时间
+		localtime_s(&t, &now); //&t out ,&now in
+		return t.tm_year + 1900;
+	}
+
+	int current_month() {
+		struct tm t;
+		time_t now;
+		time(&now);
+		localtime_s(&t, &now);
+		return t.tm_mon + 1;
+	}
+
+	int current_weekday() {
+		struct tm t;
+		time_t now;
+		time(&now);
+		localtime_s(&t, &now);
+		return t.tm_wday;
+	}
+
+	int current_day() {
+		struct tm t;
+		time_t now;
+		time(&now);
+		localtime_s(&t, &now);
+		return t.tm_mday; //yday 指的是一天中的第几天，mday指的是月份中的第几天
+	}
+
+	int current_hour() {
+		struct tm t;
+		time_t now;
+		time(&now);
+		localtime_s(&t, &now);
+		return t.tm_hour; 
+	}
+
+	int current_min() {
+		struct tm t;
+		time_t now;
+		time(&now);
+		localtime_s(&t, &now);
+		return t.tm_min;
+	}
+
+	int current_sec() {
+		struct tm t;
+		time_t now;
+		time(&now);
+		localtime_s(&t, &now);
+		return t.tm_sec;
+	}
 }
