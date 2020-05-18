@@ -43,7 +43,7 @@ public:
 	void create_simaccount();
 	bool add_position(/*Position_rt? position*/);
 	void log(const string& message);
-	string open_orders();
+	vector<rt::JsonJob> open_orders();
 	string message();
 	string account_msg();
 	string position_msg();
@@ -63,7 +63,7 @@ public:
 	bool order_check(const string& code, amount_t amount, price_t price, int towards, const string& order_id);
 	string send_order(const string& code, amount_t amount, price_t price, int towards, const string& order_id);
 	void cancel_order(const string& order_id);
-	void make_deal(/*dict order*/);
+	void make_deal(const rt::JsonJob& order);
 	void receive_deal(
 		const string& code,
 		price_t trade_price,
@@ -97,23 +97,25 @@ private:
 	string m_status;
 	string m_trading_day;
 	price_t m_init_cash;
-	price_t m_pre_balance;
+	price_t m_pre_balance;							//m_deposit - m_withdraw + m_close_profit
 	price_t m_static_balance;
 	price_t m_deposit;								//入金 (向银行存钱)
 	price_t m_withdraw;								//出金 (从银行取钱)
 	price_t m_withdrawQuota;						//可取金额
 	price_t m_close_profit;
 	price_t m_premium;								//期权权利金
-	string m_event_id;
+	int m_event_id;
 	string m_task_id;
 	price_t m_money;
 	//下面的使用string类型的Json更加适合
 	rt::JsonJob m_transfers;						//QIFI协议，这里估计是json {}
-	rt::JsonJob m_banks;							//{}
+	rt::JsonJob m_banks;				//{}
 	rt::JsonJob m_frozen;							//{}
 	rt::JsonJob m_events;							//{}
 	map<string, rt::Position_rt> m_positions;		//{}
 	rt::JsonJob m_trades;							//{}
-	rt::JsonJob m_orders;							//{}
+	rt::JsonJob m_orders;				//{}
+
+	string m_db_coll;
 };
 

@@ -22,8 +22,15 @@ namespace rt {
     class MongoJob {
     public:
         MongoJob(const string& db_name);
-        void save_position(const string& collection_name, const string& message);
-        string find_account(const string& collection, const string& account_cookie, const string& password);
+        //void save_position(const string& collection_name, const string& message);
+        //string find_account(const string& collection, const string& account_cookie, const string& password);
+        //void update_account(const string& collection, const string& account_cookie, const string& password,
+            //const string& message);
+
+        //使用之前先用find_json判断message是否已经存在了
+        void save_json(const string& collection_name, const string& message);
+        string find_json(const string& collection, const map<string, string>& condition);
+        void update_json(const string& collection, const map<string, string>& condition, const string& message);
         ~MongoJob() {}
     private:
         static mongocxx::instance m_inst;

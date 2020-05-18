@@ -32,25 +32,34 @@ namespace rt {
 		void add_string(const string& key, const string& value);
 		void add_document(const string& key, const string& value);
 		void add_document(const string& key, rapidjson::Document& value);
-
+		void add_document(const string& key, const JsonJob& value);
+		/*在外部创建array
+		*格式：
+		*rapidjson::Value arr(rapidjson::kArrayType);
+		*arr.PushBack(xxx, obj.get_m_doc()->GetAllocator());
+		*/
 		void add_array(const string& key, rapidjson::Value& arr_value);
+		//后续add(const string& key, const Order_rt& value);
+		//后续add(const string& key, const Position_rt& value);
 
 		//template<typename ValueType>
 		//void add_array(const string& key, vector<ValueType>& value);
 		//rapidjson::Value get_null_arr();
 		shared_ptr<rapidjson::Document> get_m_doc();
-		/*在外部创建array
-		 *格式：
-		 *rapidjson::Value arr(rapidjson::kArrayType);
-		 *arr.PushBack(xxx, obj.get_m_doc()->GetAllocator());
-		*/
-		//后续add(const string& key, const Order_rt& value);
-		//后续add(const string& key, const Position_rt& value);
+
 
 		//这个返回值不能用引用！！，因为是栈上的值
 		//一般情况下不要用
 		static rapidjson::Document json2doc(const string& json);
 		string jsonstr();
+
+		bool clear();
+
+		//不能使用ConstMemberIterator类型的iter,否则iter->value.GetObject()创建JsonJob出错
+		//typedef GenericObject<false, ValueType> Object;	//这个是普通指针
+		//typedef GenericObject<true, ValueType> ConstObject; //这个是Const指针对应的类型
+		rapidjson::Value::MemberIterator begin();
+		rapidjson::Value::MemberIterator end();
 	private:
 		//改为shared_ptr类型，可以拷贝，和导出了
 		shared_ptr<rapidjson::Document> m_document;

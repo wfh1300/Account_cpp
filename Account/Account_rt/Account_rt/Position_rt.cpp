@@ -606,7 +606,7 @@ namespace rt {
 
 	void Position_rt::save() {
 		rt::MongoJob mongo(m_account_cookie);
-		mongo.save_position("position", static_message());
+		mongo.save_json("position", static_message());
 	}
 
 	price_t Position_rt::calc_commission(price_t trade_price, amount_t trade_amount, int trade_towards) {

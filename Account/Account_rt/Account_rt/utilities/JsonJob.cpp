@@ -1,6 +1,6 @@
 #include "JsonJob.h"
 namespace rt {
-	//重构时，可以考虑将Allocator& m_allocator = m_allocator写入
+	
 	JsonJob::JsonJob() :
 		m_document(make_shared<rapidjson::Document>()),
 		m_allocator(m_document->GetAllocator()) {
@@ -104,6 +104,12 @@ namespace rt {
 			rapidjson::Value(value, m_allocator), m_allocator);
 	}
 
+	void JsonJob::add_document(const string& key, const JsonJob& value) {
+		const char* key_ = key.c_str();
+		m_document->AddMember(rapidjson::Value(key_, m_allocator),
+			rapidjson::Value(*value.m_document, m_allocator), m_allocator);
+	}
+
 	void JsonJob::add_array(const string& key, rapidjson::Value& arr_value) {
 		const char* key_ = key.c_str();
 		m_document->AddMember(rapidjson::Value(key_, m_allocator), arr_value, m_allocator);
@@ -127,5 +133,21 @@ namespace rt {
 		return m_document;
 	}
 
+	bool JsonJob::clear() {
+		try {
+			m_document->RemoveAllMembers();
+			return true;
+		}
+		catch (...) {
+			return false;
+		}
+	}
 
+	rapidjson::Value::MemberIterator JsonJob::begin() {
+		return m_document->MemberBegin();
+	}
+
+	rapidjson::Value::MemberIterator JsonJob::end() {
+		return m_document->MemberEnd();
+	}
 }
