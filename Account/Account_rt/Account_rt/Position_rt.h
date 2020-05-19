@@ -26,6 +26,8 @@ namespace rt {
 	typedef shared_ptr<MapAny> MapAnyPtr;
 
 	class RT_API Position_rt {
+		friend class Account_rt;
+		//friend bool rt::Account_rt::order_check(const string& code, amount_t amount, price_t price, int towards, const string& order_id);
 	public:
 		Position_rt(
 			const string& code = "RB",
@@ -88,10 +90,13 @@ namespace rt {
 		price_t m_position_profit_short();
 		price_t m_position_profit();
 
+		//用作序列化了
 		string static_message();
+		string realtime_message();
+		string message();
 
 		//ParameterPtr hold_detail();
-		//ParameterPtr realtime_message();
+		
 
 		//检查订单是否符合条件
 		bool order_check(/*int64*/price_t amount, price_t price, int towards, const string& order_id);
@@ -132,7 +137,17 @@ namespace rt {
 		//readdiff
 		//以上没有实现，后续考虑实现
 
+		//暂时用"AU"代替合约,instrument_id;
+		string code();
+
+		//序列化到json
+		//template<typename Writer>
+		//void to_json(Writer& writer);
+		
+		price_t commission();
+		
 	private:
+		
 		string m_code;							//品种名称 "AU"
 		string m_account_cookie;
 		string m_portfolio_cookie;
@@ -209,5 +224,5 @@ namespace rt {
 		//price_t m_commission_coeff_today_peramount;
 		//price_t m_commission_coeff_today_pervol;
 	};
-
 }
+

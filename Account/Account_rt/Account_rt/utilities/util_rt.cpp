@@ -32,6 +32,29 @@ namespace rt {
 		return boost::uuids::to_string(uuid_v4());
 	}
 
+	string parse_toward2direction(const int& towards) {
+		if (towards == 1 || towards == 2 || towards == 3) {
+			return "BUY";
+		}
+		else if (towards == -1 || towards == -2 || towards == -3) {
+			return "SELL";
+		}
+		else {
+			throw runtime_error("unknown towars");
+		}
+	}
+	string parse_toward2offset(const int& towards) {
+		if (towards == 2 || towards == -2) {
+			return "OPEN";
+		}
+		else if (towards == 3 || towards == -3) {
+			return "CLOSE";
+		}
+		else {
+			throw runtime_error("unknown towards");
+		}
+	}
+
 	//hku::Datetime curr_datetime(const string& interval, const string& interval2) {
 	//	string result;
 	//	struct tm t;

@@ -338,6 +338,44 @@ namespace rt {
 		return s.GetString();
 	}
 
+	string Position_rt::realtime_message() {
+		rapidjson::StringBuffer s;
+		rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+		writer.StartObject();
+		//扩展字段
+		writer.Key("last_price");
+		writer.Double(m_last_price);
+		//多头浮动盈亏
+		writer.Key("float_profit_long");
+		writer.Double(m_float_profit_long());
+		//空头浮动盈亏
+		writer.Key("float_profit_short");
+		writer.Double(m_float_profit_short());
+		//浮动盈亏
+		writer.Key("float_profit");
+		writer.Double(m_float_profit());
+		//多头持仓盈亏
+		writer.Key("position_profit_long");
+		writer.Double(m_position_profit_long());
+		//空头持仓盈亏
+		writer.Key("position_profit_short");
+		writer.Double(m_position_profit_short());
+		//持仓盈亏
+		writer.Key("position_profit");
+		writer.Double(m_position_profit());
+		writer.EndObject();
+		return s.GetString();
+	}
+
+	string Position_rt::message() {
+		string message1 = static_message();
+		string message2 = realtime_message();
+		//message1 - "}" + ", "; message2 - "{"; message1 + message2;
+		message1.pop_back(); //比erase(message2.end() - 1)快
+		message2.erase(0,1); //这个比erase(message2.begin())快
+		return message1 + "," + message2;
+	}
+
 	bool Position_rt::order_check(price_t amount, price_t price, int towards, const string& order_id) {
 		bool res = false;
 		//平仓之前要检查持仓数量是否够用
@@ -648,7 +686,7 @@ namespace rt {
 		}
 	}
 
-	static Position_rt loadfrommessage(const string& position) {
+	Position_rt Position_rt::loadfrommessage(const string& position) {
 		JsonJob parser(position);
 		string code_ = parser.hasMember("code") ? parser["code"].GetString() : parser["instrument_id"].GetString();
 		auto array_ = parser["trades"].GetArray();
@@ -705,8 +743,24 @@ namespace rt {
 			/*, auto_reload = false,
 			allow_exceed = false,
 			spms_id = "",
-			oms_id = ""*/);
+			oms_id = ""/*/);
+		if ((result.m_volume_long() + result.m_volume_short()) > 0) {
+			result.m_last_price = (result.m_open_price_long * result.m_volume_long() +
+				result.m_open_price_short * result.m_volume_short()) / (result.m_volume_long() + result.m_volume_short());
+		}
+		else {
+			result.m_last_price = 0;
+		}
+
 		return result;
+	}
+
+	string Position_rt::code() {
+		return m_code;
+	}
+
+	price_t Position_rt::commission() {
+		return m_commission;
 	}
 }
 

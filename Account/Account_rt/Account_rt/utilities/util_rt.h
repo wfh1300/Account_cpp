@@ -13,6 +13,9 @@ namespace rt {
 	//Position中使用了uuid
 	string generate_uuid_v4();
 
+	string parse_toward2direction(const int& towards);
+	string parse_toward2offset(const int& towards);
+
 	//以下函数没多大用处
 	//hku::Datetime curr_datetime(const string& interval = "-", const string& interval2 = ":");
 	int current_year();
